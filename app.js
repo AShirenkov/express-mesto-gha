@@ -3,7 +3,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 // Слушаем 3000 порт
 const mongoose = require('mongoose');
-const router = require('./routes/users.js'); // импортируем роутер
+const routerUsers = require('./routes/users'); // импортируем роутер
+
+const routerCards = require('./routes/cards'); // импортируем роутер
 
 const { PORT = 3000 } = process.env;
 
@@ -18,7 +20,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/users', router); // запускаем
+app.use('/users', routerUsers); // запускаем
+app.use('/cards', routerCards); // запускаем
 
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {});
