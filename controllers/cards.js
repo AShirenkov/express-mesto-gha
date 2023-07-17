@@ -30,6 +30,10 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCardById = (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.cardId)) {
+    return res.status(404).send({ message: "Ошибка валидации" });
+  }
+
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
