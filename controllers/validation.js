@@ -11,14 +11,14 @@ const checkMongoId = (id) => {
   return Promise.resolve();
 };
 
-const checkObject = (data, res) => {
-  if (!data) {
+const checkObject = (obj, res) => {
+  if (!obj) {
     const err = new Error();
     err.name = 'RequestError';
     return Promise.reject(err);
   }
 
-  return res.status(200).send(data);
+  return res.status(200).send(obj);
 };
 
 const checkProfileRequest = (req) => {

@@ -44,15 +44,7 @@ module.exports.deleteCardById = (req, res) => {
   // }
   checkMongoId(req.params.cardId)
     .then(() => Card.findByIdAndRemove(req.params.cardId))
-    .then((card) => {
-      // if (!card) {
-      //   return res
-      //     .status(404)
-      //     .send({ message: 'Запрашиваемые данные отсутствуют' });
-      // }
-      // res.send(card);
-      checkObject(card, res);
-    })
+    .then((card) => checkObject(card, res))
 
     .catch((err) => throwErrorResponse(err, res));
   // .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
@@ -69,15 +61,7 @@ module.exports.likeCard = (req, res) => {
       { new: true },
     ))
 
-    .then((card) => {
-      // if (!card) {
-      //   return res
-      //     .status(404)
-      //     .send({ message: 'Запрашиваемые данные отсутствуют' });
-      // }
-      // res.status(200).send(card);
-      checkObject(card, res);
-    })
+    .then((card) => checkObject(card, res))
     .catch((err) => throwErrorResponse(err, res));
   // .catch((err) => {
   //   if (err.name === "ValidationError") {
@@ -99,15 +83,7 @@ module.exports.dislikeCard = (req, res) => {
       { new: true },
     ))
 
-    .then((card) => {
-      // if (!card) {
-      //   return res
-      //     .status(404)
-      //     .send({ message: 'Запрашиваемые данные отсутствуют' });
-      // }
-      // res.status(200).send(card);
-      checkObject(card, res);
-    })
+    .then((card) => checkObject(card, res))
     .catch((err) => throwErrorResponse(err, res));
   // .catch((err) => {
   //   if (err.name === "ValidationError") {
