@@ -5,8 +5,6 @@ const checkMongoId = (id) => {
     const err = new Error();
     err.name = 'ValidationIdError';
     return Promise.reject(err);
-
-    // return res.status(400).send({ message: "Ошибка валидации" });
   }
   return Promise.resolve();
 };

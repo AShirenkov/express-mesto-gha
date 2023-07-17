@@ -17,16 +17,7 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserById = (req, res) => {
   checkMongoId(req.params.userId)
     .then(() => User.findById(req.params.userId))
-    .then(
-      (user) => checkObject(user, res),
-
-      // if (!user) {
-      //   return res
-      //     .status(404)
-      //     .send({ message: "Запрашиваемые данные отсутствуют" });
-      // }
-      // return res.status(200).send(user);
-    )
+    .then((user) => checkObject(user, res))
     .catch((err) => throwErrorResponse(err, res));
 };
 
@@ -38,9 +29,7 @@ module.exports.createUser = (req, res) => {
 
 module.exports.updateProfile = (req, res) => {
   // дополнительная проверка чтобы не переписали этим запросом аватар
-  // if (req.body.avatar || !(req.body.name && req.body.about)) {
-  //   return res.status(400).send({ message: "Ошибка валидации" });
-  // }
+
   checkProfileRequest(req)
     .then(() => User.findByIdAndUpdate(
       req.user._id,
@@ -58,12 +47,8 @@ module.exports.updateProfile = (req, res) => {
 };
 
 module.exports.updateAvatar = (req, res) => {
-  // console.log(req.body);
-  // console.log(req.body.name);
   // дополнительная проверка чтобы не переписали этим запросом имя и описание
-  // if (!req.body.avatar || req.body.name || req.body.about) {
-  //   return res.status(400).send({ message: "Ошибка валидации" });
-  // }
+
   checkAvatarRequest(req)
     .then(() => User.findByIdAndUpdate(
       req.user._id,
