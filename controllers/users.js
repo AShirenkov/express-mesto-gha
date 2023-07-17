@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('../models/user');
+const { checkMongoId, throwErrorResponse } = require('./validation');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -10,27 +11,27 @@ module.exports.getUsers = (req, res) => {
           .status(404)
           .send({ message: 'Запрашиваемые данные отсутствуют' });
       }
-      res.status(200).send(users);
+      return res.status(200).send(users);
     })
     // если данные не записались, вернём ошибку
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 module.exports.getUserById = (req, res) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
-    return res.status(400).send({ message: 'Ошибка валидации' });
-  }
-
-  User.findById(req.params.userId)
+  // if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
+  //   return res.status(400).send({ message: "Ошибка валидации" });
+  // }
+  checkMongoId(req.params.userId)
+    .then(() => User.findById(req.params.userId))
     .then((user) => {
       if (!user) {
         return res
           .status(404)
           .send({ message: 'Запрашиваемые данные отсутствуют' });
       }
-      res.status(200).send(user);
+      return res.status(200).send(user);
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => throwErrorResponse(err, res));
 };
 
 module.exports.createUser = (req, res) => {
@@ -42,7 +43,7 @@ module.exports.createUser = (req, res) => {
         return res.status(400).send({ message: 'Ошибка валидации' });
       }
 
-      res.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -51,8 +52,7 @@ module.exports.updateProfile = (req, res) => {
   // console.log(req.body.name);
   // дополнительная проверка чтобы не переписали этим запросом аватар
   if (req.body.avatar || !(req.body.name && req.body.about)) {
-    res.status(400).send({ message: 'Ошибка валидации' });
-    return;
+    return res.status(400).send({ message: 'Ошибка валидации' });
   }
   User.findByIdAndUpdate(
     req.user._id,
@@ -77,7 +77,7 @@ module.exports.updateProfile = (req, res) => {
         return res.status(400).send({ message: 'Ошибка валидации 1' });
       }
 
-      res.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -86,8 +86,7 @@ module.exports.updateAvatar = (req, res) => {
   console.log(req.body.name);
   // дополнительная проверка чтобы не переписали этим запросом имя и описание
   if (!req.body.avatar || req.body.name || req.body.about) {
-    res.status(400).send({ message: 'Ошибка валидации' });
-    return;
+    return res.status(400).send({ message: 'Ошибка валидации' });
   }
   User.findByIdAndUpdate(
     req.user._id,
@@ -105,13 +104,13 @@ module.exports.updateAvatar = (req, res) => {
           .status(404)
           .send({ message: 'Запрашиваемые данные отсутствуют' });
       }
-      res.status(200).send(user);
+      return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Ошибка валидации' });
       }
 
-      res.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
