@@ -1,5 +1,10 @@
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const Card = require('../models/card');
+const {
+  checkMongoId,
+  throwErrorResponse,
+  checkObject,
+} = require('./validation');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -13,29 +18,31 @@ module.exports.getCards = (req, res) => {
       res.status(200).send(cards);
     })
 
-    // если данные не записались, вернём ошибку
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => throwErrorResponse(err, res));
+  // если данные не записались, вернём ошибку
+  // .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
 };
 module.exports.createCard = (req, res) => {
   // console.log(req.body);
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user })
     .then((card) => res.status(201).send(card))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Ошибка валидации' });
-      }
+    .catch((err) => throwErrorResponse(err, res));
+  // .catch((err) => {
+  //   if (err.name === "ValidationError") {
+  //     return res.status(400).send({ message: "Ошибка валидации" });
+  //   }
 
-      res.status(500).send({ message: 'Произошла ошибка' });
-    });
+  //   res.status(500).send({ message: "Произошла ошибка" });
+  // });
 };
 
 module.exports.deleteCardById = (req, res) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.cardId)) {
-    return res.status(400).send({ message: 'Ошибка валидации' });
-  }
-
-  Card.findByIdAndRemove(req.params.cardId)
+  // if (!mongoose.Types.ObjectId.isValid(req.params.cardId)) {
+  //   return res.status(400).send({ message: "Ошибка валидации" });
+  // }
+  checkMongoId(req.params.cardId)
+    .then(() => Card.findByIdAndRemove(req.params.cardId))
     .then((card) => {
       if (!card) {
         return res
@@ -45,19 +52,21 @@ module.exports.deleteCardById = (req, res) => {
       res.send(card);
     })
 
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => throwErrorResponse(err, res));
+  // .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
 };
 
 module.exports.likeCard = (req, res) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.cardId)) {
-    return res.status(400).send({ message: 'Ошибка валидации' });
-  }
+  // if (!mongoose.Types.ObjectId.isValid(req.params.cardId)) {
+  //   return res.status(400).send({ message: "Ошибка валидации" });
+  // }
+  checkMongoId(req.params.cardId)
+    .then(() => Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+      { new: true },
+    ))
 
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-    { new: true },
-  )
     .then((card) => {
       if (!card) {
         return res
@@ -66,24 +75,27 @@ module.exports.likeCard = (req, res) => {
       }
       res.status(200).send(card);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Ошибка валидации' });
-      }
+    .catch((err) => throwErrorResponse(err, res));
+  // .catch((err) => {
+  //   if (err.name === "ValidationError") {
+  //     return res.status(400).send({ message: "Ошибка валидации" });
+  //   }
 
-      res.status(500).send({ message: 'Произошла ошибка' });
-    });
+  //   res.status(500).send({ message: "Произошла ошибка" });
+  // });
 };
 
 module.exports.dislikeCard = (req, res) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.cardId)) {
-    return res.status(400).send({ message: 'Ошибка валидации' });
-  }
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } }, // убрать _id из массива
-    { new: true },
-  )
+  // if (!mongoose.Types.ObjectId.isValid(req.params.cardId)) {
+  //   return res.status(400).send({ message: "Ошибка валидации" });
+  // }
+  checkMongoId(req.params.cardId)
+    .then(() => Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $pull: { likes: req.user._id } }, // убрать _id из массива
+      { new: true },
+    ))
+
     .then((card) => {
       if (!card) {
         return res
@@ -92,11 +104,12 @@ module.exports.dislikeCard = (req, res) => {
       }
       res.status(200).send(card);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Ошибка валидации' });
-      }
+    .catch((err) => throwErrorResponse(err, res));
+  // .catch((err) => {
+  //   if (err.name === "ValidationError") {
+  //     return res.status(400).send({ message: "Ошибка валидации" });
+  //   }
 
-      res.status(500).send({ message: 'Произошла ошибка' });
-    });
+  //   res.status(500).send({ message: "Произошла ошибка" });
+  // });
 };
