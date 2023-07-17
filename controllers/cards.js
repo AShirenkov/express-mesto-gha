@@ -10,12 +10,13 @@ module.exports.getCards = (req, res) => {
   Card.find({})
     // возвращаем записанные в базу данные пользователю
     .then((cards) => {
-      if (!cards) {
-        return res
-          .status(404)
-          .send({ message: 'Запрашиваемые данные отсутствуют' });
-      }
-      res.status(200).send(cards);
+      // if (!cards) {
+      //   return res
+      //     .status(404)
+      //     .send({ message: 'Запрашиваемые данные отсутствуют' });
+      // }
+      // res.status(200).send(cards);
+      checkObject(cards, res);
     })
 
     .catch((err) => throwErrorResponse(err, res));
@@ -44,12 +45,13 @@ module.exports.deleteCardById = (req, res) => {
   checkMongoId(req.params.cardId)
     .then(() => Card.findByIdAndRemove(req.params.cardId))
     .then((card) => {
-      if (!card) {
-        return res
-          .status(404)
-          .send({ message: 'Запрашиваемые данные отсутствуют' });
-      }
-      res.send(card);
+      // if (!card) {
+      //   return res
+      //     .status(404)
+      //     .send({ message: 'Запрашиваемые данные отсутствуют' });
+      // }
+      // res.send(card);
+      checkObject(card, res);
     })
 
     .catch((err) => throwErrorResponse(err, res));
@@ -68,12 +70,13 @@ module.exports.likeCard = (req, res) => {
     ))
 
     .then((card) => {
-      if (!card) {
-        return res
-          .status(404)
-          .send({ message: 'Запрашиваемые данные отсутствуют' });
-      }
-      res.status(200).send(card);
+      // if (!card) {
+      //   return res
+      //     .status(404)
+      //     .send({ message: 'Запрашиваемые данные отсутствуют' });
+      // }
+      // res.status(200).send(card);
+      checkObject(card, res);
     })
     .catch((err) => throwErrorResponse(err, res));
   // .catch((err) => {
@@ -97,12 +100,13 @@ module.exports.dislikeCard = (req, res) => {
     ))
 
     .then((card) => {
-      if (!card) {
-        return res
-          .status(404)
-          .send({ message: 'Запрашиваемые данные отсутствуют' });
-      }
-      res.status(200).send(card);
+      // if (!card) {
+      //   return res
+      //     .status(404)
+      //     .send({ message: 'Запрашиваемые данные отсутствуют' });
+      // }
+      // res.status(200).send(card);
+      checkObject(card, res);
     })
     .catch((err) => throwErrorResponse(err, res));
   // .catch((err) => {
