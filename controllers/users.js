@@ -1,20 +1,25 @@
-const mongoose = require('mongoose');
-const User = require('../models/user');
-const { checkMongoId, throwErrorResponse } = require('./validation');
+const User = require("../models/user");
+const {
+  checkMongoId,
+  throwErrorResponse,
+  checkObject,
+} = require("./validation");
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     // возвращаем записанные в базу данные пользователю
     .then((users) => {
-      if (!users) {
-        return res
-          .status(404)
-          .send({ message: 'Запрашиваемые данные отсутствуют' });
-      }
-      return res.status(200).send(users);
+      checkObject(users, res);
+      // if (!users) {
+      //   return res
+      //     .status(404)
+      //     .send({ message: "Запрашиваемые данные отсутствуют" });
+      // }
+      // return res.status(200).send(users);
     })
     // если данные не записались, вернём ошибку
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    // .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
+    .catch((err) => throwErrorResponse(err, res));
 };
 
 module.exports.getUserById = (req, res) => {
@@ -24,12 +29,13 @@ module.exports.getUserById = (req, res) => {
   checkMongoId(req.params.userId)
     .then(() => User.findById(req.params.userId))
     .then((user) => {
-      if (!user) {
-        return res
-          .status(404)
-          .send({ message: 'Запрашиваемые данные отсутствуют' });
-      }
-      return res.status(200).send(user);
+      checkObject(user, res);
+      // if (!user) {
+      //   return res
+      //     .status(404)
+      //     .send({ message: "Запрашиваемые данные отсутствуют" });
+      // }
+      // return res.status(200).send(user);
     })
     .catch((err) => throwErrorResponse(err, res));
 };
@@ -38,13 +44,14 @@ module.exports.createUser = (req, res) => {
   // console.log(req.body);
   User.create(req.body)
     .then((user) => res.status(201).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Ошибка валидации' });
-      }
+    .catch((err) => throwErrorResponse(err, res));
+  // .catch((err) => {
+  //   if (err.name === 'ValidationError') {
+  //     return res.status(400).send({ message: 'Ошибка валидации' });
+  //   }
 
-      return res.status(500).send({ message: 'Произошла ошибка' });
-    });
+  //   return res.status(500).send({ message: 'Произошла ошибка' });
+  // });
 };
 
 module.exports.updateProfile = (req, res) => {
@@ -52,7 +59,7 @@ module.exports.updateProfile = (req, res) => {
   // console.log(req.body.name);
   // дополнительная проверка чтобы не переписали этим запросом аватар
   if (req.body.avatar || !(req.body.name && req.body.about)) {
-    return res.status(400).send({ message: 'Ошибка валидации' });
+    return res.status(400).send({ message: "Ошибка валидации" });
   }
   User.findByIdAndUpdate(
     req.user._id,
@@ -62,23 +69,25 @@ module.exports.updateProfile = (req, res) => {
       new: true, // обработчик then получит на вход обновлённую запись
       runValidators: true, // данные будут валидированы перед изменением
       upsert: false, // если пользователь не найден, он не будет создан
-    },
+    }
   )
     .then((user) => {
-      if (!user) {
-        return res
-          .status(404)
-          .send({ message: 'Запрашиваемые данные отсутствуют' });
-      }
-      res.status(200).send(user);
+      checkObject(user, res);
+      // if (!user) {
+      //   return res
+      //     .status(404)
+      //     .send({ message: "Запрашиваемые данные отсутствуют" });
+      // }
+      // res.status(200).send(user);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Ошибка валидации 1' });
-      }
+    .catch((err) => throwErrorResponse(err, res));
+  // .catch((err) => {
+  //   if (err.name === 'ValidationError') {
+  //     return res.status(400).send({ message: 'Ошибка валидации 1' });
+  //   }
 
-      return res.status(500).send({ message: 'Произошла ошибка' });
-    });
+  //   return res.status(500).send({ message: 'Произошла ошибка' });
+  // });
 };
 
 module.exports.updateAvatar = (req, res) => {
@@ -86,7 +95,7 @@ module.exports.updateAvatar = (req, res) => {
   console.log(req.body.name);
   // дополнительная проверка чтобы не переписали этим запросом имя и описание
   if (!req.body.avatar || req.body.name || req.body.about) {
-    return res.status(400).send({ message: 'Ошибка валидации' });
+    return res.status(400).send({ message: "Ошибка валидации" });
   }
   User.findByIdAndUpdate(
     req.user._id,
@@ -96,21 +105,23 @@ module.exports.updateAvatar = (req, res) => {
       new: true, // обработчик then получит на вход обновлённую запись
       runValidators: true, // данные будут валидированы перед изменением
       upsert: false, // если пользователь не найден, он не будет создан
-    },
+    }
   )
     .then((user) => {
-      if (!user) {
-        return res
-          .status(404)
-          .send({ message: 'Запрашиваемые данные отсутствуют' });
-      }
-      return res.status(200).send(user);
+      checkObject(user, res);
+      // if (!user) {
+      //   return res
+      //     .status(404)
+      //     .send({ message: "Запрашиваемые данные отсутствуют" });
+      // }
+      // return res.status(200).send(user);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Ошибка валидации' });
-      }
+    // .catch((err) => {
+    //   if (err.name === "ValidationError") {
+    //     return res.status(400).send({ message: "Ошибка валидации" });
+    //   }
 
-      return res.status(500).send({ message: 'Произошла ошибка' });
-    });
+    //   return res.status(500).send({ message: "Произошла ошибка" });
+    // });
+    .catch((err) => throwErrorResponse(err, res));
 };
