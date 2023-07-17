@@ -29,13 +29,13 @@ module.exports.getUserById = (req, res) => {
   checkMongoId(req.params.userId)
     .then(() => User.findById(req.params.userId))
     .then((user) => {
-      checkObject(user, res);
-      // if (!user) {
-      //   return res
-      //     .status(404)
-      //     .send({ message: "Запрашиваемые данные отсутствуют" });
-      // }
-      // return res.status(200).send(user);
+      // checkObject(user, res);
+      if (!user) {
+        return res
+          .status(404)
+          .send({ message: "Запрашиваемые данные отсутствуют" });
+      }
+      return res.status(200).send(user);
     })
     .catch((err) => throwErrorResponse(err, res));
 };
