@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const routerUsers = require('./routes/users'); // импортируем роутер
 
 const routerCards = require('./routes/cards'); // импортируем роутер
+const { statusCode } = require('./utils/constants');
 
 const { PORT = 3000 } = process.env;
 
@@ -27,7 +28,9 @@ app.use((req, res, next) => {
 app.use('/users', routerUsers); // запускаем
 app.use('/cards', routerCards); // запускаем
 app.use('/', (req, res, next) => {
-  res.status(404).send({ message: 'такого адреса не существует' });
+  res
+    .status(statusCode.notFound)
+    .send({ message: 'такого адреса не существует' });
   next();
 });
 

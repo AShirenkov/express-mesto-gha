@@ -1,5 +1,6 @@
 // const mongoose = require('mongoose');
 const Card = require('../models/card');
+const { statusCode } = require('../utils/constants');
 const {
   checkMongoId,
   throwErrorResponse,
@@ -15,7 +16,7 @@ module.exports.getCards = (req, res) => {
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user })
-    .then((card) => res.status(201).send(card))
+    .then((card) => res.status(statusCode.created).send(card))
     .catch((err) => throwErrorResponse(err, res));
 };
 

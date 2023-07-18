@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { statusCode } = require('../utils/constants');
 
 const checkMongoId = (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -16,7 +17,7 @@ const checkObject = (obj, res) => {
     return Promise.reject(err);
   }
 
-  return res.status(200).send(obj);
+  return res.status(statusCode.ok).send(obj);
 };
 
 const checkProfileRequest = (req) => {
@@ -38,31 +39,33 @@ const checkAvatarRequest = (req) => {
 
 const throwErrorResponse = (err, res) => {
   if (err.name === 'ValidationIdError') {
-    return res.status(400).send({
+    return res.status(statusCode.badRequest).send({
       message: 'Переданы некорректные данные для запроса. Неверный ID',
     });
   }
   if (err.name === 'ValidationError') {
-    return res.status(400).send({
+    return res.status(statusCode.badRequest).send({
       message: 'Ошибка валидации данных',
     });
   }
   if (err.name === 'ValidationProfileError') {
-    return res.status(400).send({
-      message: 'Некореректный зароос на обновление профиля',
+    return res.status(statusCode.badRequest).send({
+      message: 'Некорректный запрос на обновление профиля',
     });
   }
   if (err.name === 'ValidationAvatarError') {
-    return res.status(400).send({
-      message: 'Некореректный зароос на обновление аватара',
+    return res.status(statusCode.badRequest).send({
+      message: 'Некорректный зароос на обновление аватара',
     });
   }
   if (err.name === 'RequestError') {
-    return res.status(404).send({
+    return res.status(statusCode.notFound).send({
       message: 'Запрашиваемые данные отсутствуют',
     });
   }
-  return res.status(500).send({ message: 'Произошла ошибка' });
+  return res
+    .status(statusCode.internalServerError)
+    .send({ message: 'Произошла ошибка' });
 };
 // err.name = "RequestError";
 module.exports = {

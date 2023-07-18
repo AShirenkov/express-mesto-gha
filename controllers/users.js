@@ -6,6 +6,7 @@ const {
   checkAvatarRequest,
   checkProfileRequest,
 } = require('./validation');
+const { statusCode } = require('../utils/constants');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -23,7 +24,7 @@ module.exports.getUserById = (req, res) => {
 
 module.exports.createUser = (req, res) => {
   User.create(req.body)
-    .then((user) => res.status(201).send(user))
+    .then((user) => res.status(statusCode.created).send(user))
     .catch((err) => throwErrorResponse(err, res));
 };
 
