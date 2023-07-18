@@ -10,7 +10,7 @@ const {
 module.exports.getCards = (req, res) => {
   Card.find({})
 
-    .then((cards) => checkObject(cards, res))
+    .then((cards) => res.send(cards))
     .catch((err) => throwErrorResponse(err, res));
 };
 module.exports.createCard = (req, res) => {

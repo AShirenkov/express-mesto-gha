@@ -11,7 +11,7 @@ const { statusCode } = require('../utils/constants');
 module.exports.getUsers = (req, res) => {
   User.find({})
     // возвращаем записанные в базу данные пользователю
-    .then((users) => checkObject(users, res))
+    .then((users) => res.send(users))
     .catch((err) => throwErrorResponse(err, res));
 };
 
