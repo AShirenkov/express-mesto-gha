@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -19,8 +19,7 @@ const userSchema = new mongoose.Schema({
     // ссылка на аватарку, строка, обязательное поле.
     type: String,
     required: true,
-    minlength: 4,
   },
 });
 
-module.exports = mongoose.model('user', userSchema);
+module.exports = mongoose.model("user", userSchema);
