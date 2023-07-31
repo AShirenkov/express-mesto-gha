@@ -12,6 +12,7 @@ const {
 } = require('./validation');
 const { statusCode } = require('../utils/constants');
 const AuthError = require('../errors/auth-error');
+const AlreadyExistError = require('../errors/already-exist-error');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -50,7 +51,22 @@ module.exports.createUser = (req, res, next) => {
       name: user.name,
       about: user.about,
     }))
-    .catch(next);
+    .catch((err) => {
+      // проверяем статус и выставляем сообщение в зависимости от него
+      // err.code === 11000
+      //   ? next(new AlreadyExistError("Данные с таким email уже есть в БД"))
+      //   : next(err);
+      // c линтером не прокатывает..
+
+      // проверяем статус и выставляем сообщение в зависимости от него
+      if (err.code === 11000) {
+        return next(
+          new AlreadyExistError('Данные с таким email уже есть в БД'),
+        );
+      }
+
+      return next(err);
+    });
 };
 
 module.exports.updateProfile = (req, res, next) => {
