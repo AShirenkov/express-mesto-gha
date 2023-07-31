@@ -44,7 +44,12 @@ module.exports.createUser = (req, res, next) => {
       name: req.body.name,
       about: req.body.about,
     }))
-    .then((user) => res.status(statusCode.created).send(user))
+    .then((user) => res.status(statusCode.created).send({
+      email: user.email,
+      avatar: user.avatar,
+      name: user.name,
+      about: user.about,
+    }))
     .catch(next);
 };
 
