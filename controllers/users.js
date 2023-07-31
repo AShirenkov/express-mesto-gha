@@ -1,4 +1,6 @@
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
 const User = require("../models/user");
 const {
   checkMongoId,
@@ -17,6 +19,13 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUserById = (req, res) => {
+  checkMongoId(req.params.userId)
+    .then(() => User.findById(req.params.userId))
+    .then((user) => checkObject(user, res))
+    .catch((err) => throwErrorResponse(err, res));
+};
+
+module.exports.getCurrentUser = (req, res) => {
   checkMongoId(req.params.userId)
     .then(() => User.findById(req.params.userId))
     .then((user) => checkObject(user, res))
@@ -79,4 +88,24 @@ module.exports.updateAvatar = (req, res) => {
 
     .then((user) => checkObject(user, res))
     .catch((err) => throwErrorResponse(err, res));
+};
+// controllers/users.js
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        "some-secret-key",
+        { expiresIn: "7d" } // токен будет просрочен через час после создания
+      );
+
+      res.send({ token });
+    })
+    .catch((err) => {
+      // ошибка аутентификации
+      res.status(401).send({ message: err.message });
+    });
 };
