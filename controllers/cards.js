@@ -3,31 +3,31 @@ const Card = require('../models/card');
 const { statusCode } = require('../utils/constants');
 const {
   checkMongoId,
-  throwErrorResponse,
+  // throwErrorResponse,
   checkObject,
 } = require('./validation');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
 
     .then((cards) => res.send(cards))
-    .catch((err) => throwErrorResponse(err, res));
+    .catch(next);
 };
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user })
     .then((card) => res.status(statusCode.created).send(card))
-    .catch((err) => throwErrorResponse(err, res));
+    .catch(next);
 };
 
-module.exports.deleteCardById = (req, res) => {
+module.exports.deleteCardById = (req, res, next) => {
   checkMongoId(req.params.cardId)
     .then(() => Card.findByIdAndRemove(req.params.cardId))
     .then((card) => checkObject(card, res))
-    .catch((err) => throwErrorResponse(err, res));
+    .catch(next);
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   checkMongoId(req.params.cardId)
     .then(() => Card.findByIdAndUpdate(
       req.params.cardId,
@@ -35,10 +35,10 @@ module.exports.likeCard = (req, res) => {
       { new: true },
     ))
     .then((card) => checkObject(card, res))
-    .catch((err) => throwErrorResponse(err, res));
+    .catch(next);
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   checkMongoId(req.params.cardId)
     .then(() => Card.findByIdAndUpdate(
       req.params.cardId,
@@ -46,5 +46,5 @@ module.exports.dislikeCard = (req, res) => {
       { new: true },
     ))
     .then((card) => checkObject(card, res))
-    .catch((err) => throwErrorResponse(err, res));
+    .catch(next);
 };

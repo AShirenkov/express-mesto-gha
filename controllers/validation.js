@@ -1,20 +1,24 @@
 const mongoose = require('mongoose');
+const BadRequestError = require('../errors/bad-request-error');
+const NotFoundError = require('../errors/not-found-error');
 const { statusCode } = require('../utils/constants');
 
 const checkMongoId = (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    const err = new Error();
-    err.name = 'ValidationIdError';
-    return Promise.reject(err);
+    return Promise.reject(
+      new BadRequestError(
+        'Переданы некорректные данные для запроса. Неверный ID',
+      ),
+    );
   }
   return Promise.resolve();
 };
 
 const checkObject = (obj, res) => {
   if (!obj) {
-    const err = new Error();
-    err.name = 'RequestError';
-    return Promise.reject(err);
+    return Promise.reject(
+      new NotFoundError('Запрашиваемые данные отсутствуют'),
+    );
   }
 
   return res.status(statusCode.ok).send(obj);
@@ -22,17 +26,17 @@ const checkObject = (obj, res) => {
 
 const checkProfileRequest = (req) => {
   if (req.body.avatar || !(req.body.name && req.body.about)) {
-    const err = new Error();
-    err.name = 'ValidationAvatarError';
-    return Promise.reject(err);
+    return Promise.reject(
+      new BadRequestError('Некорректный запрос на обновление профиля'),
+    );
   }
   return Promise.resolve();
 };
 const checkAvatarRequest = (req) => {
   if (!req.body.avatar || req.body.name || req.body.about) {
-    const err = new Error();
-    err.name = 'ValidationProfileError';
-    return Promise.reject(err);
+    return Promise.reject(
+      new BadRequestError('Некорректный зароос на обновление аватара'),
+    );
   }
   return Promise.resolve();
 };

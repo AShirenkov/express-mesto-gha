@@ -5,35 +5,36 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const {
   checkMongoId,
-  throwErrorResponse,
+  // throwErrorResponse,
   checkObject,
   checkAvatarRequest,
   checkProfileRequest,
 } = require('./validation');
 const { statusCode } = require('../utils/constants');
+const AuthError = require('../errors/auth-error');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     // возвращаем записанные в базу данные пользователю
     .then((users) => res.send(users))
-    .catch((err) => throwErrorResponse(err, res));
+    .catch(next);
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   checkMongoId(req.params.userId)
     .then(() => User.findById(req.params.userId))
     .then((user) => checkObject(user, res))
-    .catch((err) => throwErrorResponse(err, res));
+    .catch(next);
 };
 
-module.exports.getCurrentUser = (req, res) => {
+module.exports.getCurrentUser = (req, res, next) => {
   checkMongoId(req.params.userId)
     .then(() => User.findById(req.params.userId))
     .then((user) => checkObject(user, res))
-    .catch((err) => throwErrorResponse(err, res));
+    .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => User.create({
@@ -44,10 +45,10 @@ module.exports.createUser = (req, res) => {
       about: req.body.about,
     }))
     .then((user) => res.status(statusCode.created).send(user))
-    .catch((err) => throwErrorResponse(err, res));
+    .catch(next);
 };
 
-module.exports.updateProfile = (req, res) => {
+module.exports.updateProfile = (req, res, next) => {
   // дополнительная проверка чтобы не переписали этим запросом аватар
 
   checkProfileRequest(req)
@@ -63,10 +64,10 @@ module.exports.updateProfile = (req, res) => {
     ))
 
     .then((user) => checkObject(user, res))
-    .catch((err) => throwErrorResponse(err, res));
+    .catch(next);
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   // дополнительная проверка чтобы не переписали этим запросом имя и описание
 
   checkAvatarRequest(req)
@@ -82,11 +83,11 @@ module.exports.updateAvatar = (req, res) => {
     ))
 
     .then((user) => checkObject(user, res))
-    .catch((err) => throwErrorResponse(err, res));
+    .catch(next);
 };
 // controllers/users.js
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -96,11 +97,7 @@ module.exports.login = (req, res) => {
         'some-secret-key',
         { expiresIn: '7d' }, // токен будет просрочен через час после создания
       );
-
       res.send({ token });
     })
-    .catch((err) => {
-      // ошибка аутентификации
-      res.status(401).send({ message: err.message });
-    });
+    .catch(() => next(new AuthError('Необходима авторизация')));
 };
