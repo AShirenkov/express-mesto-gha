@@ -1,11 +1,7 @@
 // const mongoose = require('mongoose');
 const Card = require('../models/card');
 const { statusCode } = require('../utils/constants');
-const {
-  checkMongoId,
-  // throwErrorResponse,
-  checkObject,
-} = require('./validation');
+const { checkMongoId, checkOwnerCard, checkObject } = require('./validation');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -22,6 +18,8 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCardById = (req, res, next) => {
   checkMongoId(req.params.cardId)
+    .then(() => Card.findById(req.params.cardId))
+    .then((card) => checkOwnerCard(card, req.user._id))
     .then(() => Card.findByIdAndRemove(req.params.cardId))
     .then((card) => checkObject(card, res))
     .catch(next);

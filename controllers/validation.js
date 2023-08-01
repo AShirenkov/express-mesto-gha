@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const AccessDeniedError = require('../errors/access-denied-error');
+// const AlreadyExistError = require('../errors/already-exist-error');
 const BadRequestError = require('../errors/bad-request-error');
 const NotFoundError = require('../errors/not-found-error');
 const { statusCode } = require('../utils/constants');
@@ -22,6 +24,20 @@ const checkObject = (obj, res) => {
   }
 
   return res.status(statusCode.ok).send(obj);
+};
+
+const checkOwnerCard = (obj, id) => {
+  if (!obj) {
+    return Promise.reject(
+      new NotFoundError('Запрашиваемые данные отсутствуют'),
+    );
+  }
+  if (obj.owner._id !== id) {
+    return Promise.reject(
+      new AccessDeniedError('Нет доступа к удалению карточки'),
+    );
+  }
+  return obj;
 };
 
 const checkProfileRequest = (req) => {
@@ -78,4 +94,5 @@ module.exports = {
   checkObject,
   checkAvatarRequest,
   checkProfileRequest,
+  checkOwnerCard,
 };
