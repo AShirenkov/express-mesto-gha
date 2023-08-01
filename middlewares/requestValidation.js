@@ -1,4 +1,4 @@
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi } = require("celebrate");
 
 module.exports.checkSignin = celebrate({
   body: Joi.object().keys({
@@ -30,5 +30,10 @@ module.exports.checkUserInfo = celebrate({
 module.exports.checkUserAvatar = celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().min(18), // сделать проверку регуляркой на ссылку
+  }),
+});
+module.exports.checkCardID = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
   }),
 });
