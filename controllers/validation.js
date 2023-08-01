@@ -32,7 +32,7 @@ const checkOwnerCard = (obj, id) => {
       new NotFoundError('Запрашиваемые данные отсутствуют'),
     );
   }
-  if (obj.owner._id !== id) {
+  if (obj.owner._id.toString() !== id) {
     return Promise.reject(
       new AccessDeniedError('Нет доступа к удалению карточки'),
     );
