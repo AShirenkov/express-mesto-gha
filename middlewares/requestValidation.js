@@ -1,6 +1,6 @@
 const { celebrate, Joi } = require('celebrate');
 
-const regexUrl = /https?\/\/[\w\-@]{1,63}\.[a-z0-9]{1,63}[-a-z0-9._~:/?#[\]@!$&'()*+,;=]*#?/i;
+const regexUrl = /https?:\/\/(www\.)?[\w\-@]{1,63}\.[a-z0-9]{1,63}[-a-z0-9._~:/?#[\]@!$&'()*+,;=]*#?/i;
 
 module.exports.checkSignin = celebrate({
   body: Joi.object().keys({
