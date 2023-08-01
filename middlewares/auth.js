@@ -3,7 +3,7 @@ const AuthError = require('../errors/auth-error');
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
-  // console.log("тест");
+
   if (!authorization || !authorization.startsWith('Bearer ')) {
     return next(new AuthError('Необходима авторизация'));
   }
@@ -18,7 +18,6 @@ module.exports = (req, res, next) => {
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
-  // console.log(req.user._id);
 
   return next(); // пропускаем запрос дальше
 };

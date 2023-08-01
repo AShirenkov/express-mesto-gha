@@ -15,8 +15,6 @@ const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-error');
 const { checkSignin, checkSignup } = require('./middlewares/requestValidation');
 
-// const { statusCode } = require('./utils/constants');
-
 const { PORT = 3000 } = process.env;
 
 // подключаемся к серверу mongo

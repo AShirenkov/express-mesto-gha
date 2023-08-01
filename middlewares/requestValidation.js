@@ -14,7 +14,6 @@ module.exports.checkSignup = celebrate({
     password: Joi.string().required().min(8),
     // необязательные дополнительные поля на случай окна регистрации с расширенными возможностями
     name: Joi.string().min(2).max(30),
-    // avatar: Joi.string().min(18), // сделать проверку регуляркой на ссылку
     avatar: Joi.string().regex(regexUrl),
     about: Joi.string().min(2).max(30),
   }),
@@ -33,7 +32,6 @@ module.exports.checkUserInfo = celebrate({
 });
 module.exports.checkUserAvatar = celebrate({
   body: Joi.object().keys({
-    // avatar: Joi.string().min(18), // сделать проверку регуляркой на ссылку
     avatar: Joi.string().regex(regexUrl),
   }),
 });
@@ -51,7 +49,6 @@ module.exports.checkCardID = celebrate({
 module.exports.checkCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    // link: Joi.string().required().min(18), // сделать проверку регуляркой на ссылку
 
     link: Joi.string().required().regex(regexUrl),
   }),
