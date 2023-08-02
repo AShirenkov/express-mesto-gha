@@ -14,6 +14,7 @@ const auth = require('./middlewares/auth');
 
 const NotFoundError = require('./errors/not-found-error');
 const { checkSignin, checkSignup } = require('./middlewares/requestValidation');
+const handlerErrors = require('./middlewares/handlerErrors');
 
 const { PORT = 3000 } = process.env;
 
@@ -34,16 +35,7 @@ app.use('/', (req, res, next) => {
   next(new NotFoundError('Nакого адреса не существует'));
 });
 app.use(errors());
-app.use((err, req, res, next) => {
-  // если у ошибки нет статуса, выставляем 500
-  const { statusCode = 500, message } = err;
-
-  res.status(statusCode).send({
-    // проверяем статус и выставляем сообщение в зависимости от него
-    message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
-  });
-  return next();
-});
+app.use(handlerErrors);
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
