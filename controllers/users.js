@@ -5,8 +5,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { checkObject } = require('./validation');
 const { statusCode } = require('../utils/constants');
-const AuthError = require('../errors/auth-error');
+
 const AlreadyExistError = require('../errors/already-exist-error');
+const BadRequestError = require('../errors/bad-request-error');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -45,19 +46,15 @@ module.exports.createUser = (req, res, next) => {
     }))
     .catch((err) => {
       // проверяем статус и выставляем сообщение в зависимости от него
-      // err.code === 11000
-      //   ? next(new AlreadyExistError("Данные с таким email уже есть в БД"))
-      //   : next(err);
-      // c линтером не прокатывает..
-
-      // проверяем статус и выставляем сообщение в зависимости от него
       if (err.code === 11000) {
-        return next(
-          new AlreadyExistError('Данные с таким email уже есть в БД'),
+        next(new AlreadyExistError('Данные с таким email уже есть в БД'));
+      } else if (err.name === 'ValidationError') {
+        next(
+          new BadRequestError('Некорректные данные при создании пользователя'),
         );
+      } else {
+        next(err);
       }
-
-      return next(err);
     });
 };
 
@@ -75,7 +72,17 @@ module.exports.updateProfile = (req, res, next) => {
     },
   )
     .then((user) => checkObject(user, res))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(
+          new BadRequestError(
+            'Некорректные данные при обновлении данных пользователя',
+          ),
+        );
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.updateAvatar = (req, res, next) => {
@@ -92,7 +99,13 @@ module.exports.updateAvatar = (req, res, next) => {
     },
   )
     .then((user) => checkObject(user, res))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Некорректные данные при обновлении аватара'));
+      } else {
+        next(err);
+      }
+    });
 };
 // controllers/users.js
 
@@ -108,5 +121,5 @@ module.exports.login = (req, res, next) => {
       );
       res.send({ token });
     })
-    .catch(() => next(new AuthError('Необходима авторизация')));
+    .catch(next);
 };
